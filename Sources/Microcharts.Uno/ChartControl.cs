@@ -1,5 +1,6 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 
 namespace Microcharts.Uno
 {
@@ -18,32 +19,16 @@ namespace Microcharts.Uno
         {
             base.OnApplyTemplate();
 
-            var chartView = ChartView;
-            var chartViewGL = ChartViewGL;
+            SetChartViewsAndCharts();
 
-            if (HardwareAccelerated)
+            if (GetTemplateChild("ContentPresenter") is UIElement contentGrid)
             {
-                if (chartView != null)
-                {
-                    chartView.Chart = null;
-                    chartView = null;
-                }
-                if (chartViewGL == null) chartViewGL = new ChartViewGL();
-                chartViewGL.Chart = Chart;
+                //contentGrid.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                //contentGrid.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
+                contentGrid.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
+                contentGrid.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
+                contentGrid.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnPointerWheelChangedEvent), true);
             }
-            else
-            {
-                if (chartViewGL != null)
-                {
-                    chartViewGL.Chart = null;
-                    chartViewGL = null;
-                }
-                if (chartView == null) chartView = new ChartView();
-                chartView.Chart = Chart;
-            }
-
-            ChartView = chartView;
-            ChartViewGL = chartViewGL;
         }
 
         /// <summary>
@@ -51,7 +36,7 @@ namespace Microcharts.Uno
         /// </summary>
         private static readonly DependencyProperty ChartViewProperty = DependencyProperty.Register(nameof(ChartView),
             typeof(ChartView), typeof(ChartControl),
-            new PropertyMetadata(null, (d, args) => ((ChartControl)d).OnChartViewChanged((ChartView)args.OldValue)));
+            new PropertyMetadata(null, (d, args) => ((ChartControl)d).SetChartViewsAndCharts()));
         /// <summary>
         /// Gets or sets the ChartView
         /// </summary>
@@ -66,7 +51,7 @@ namespace Microcharts.Uno
         /// </summary>
         private static readonly DependencyProperty ChartViewGLProperty = DependencyProperty.Register(nameof(ChartViewGL),
             typeof(ChartViewGL), typeof(ChartControl),
-            new PropertyMetadata(null, (d, args) => ((ChartControl)d).OnChartViewGLChanged((ChartViewGL)args.OldValue)));
+            new PropertyMetadata(null, (d, args) => ((ChartControl)d).SetChartViewsAndCharts()));
         /// <summary>
         /// Gets or sets the ChartViewGL
         /// </summary>
@@ -81,7 +66,7 @@ namespace Microcharts.Uno
         /// </summary>
         private static readonly DependencyProperty ChartProperty = DependencyProperty.Register(nameof(Chart),
             typeof(Chart), typeof(ChartControl),
-            new PropertyMetadata(null, (d, args) => ((ChartControl)d).OnChartChanged((Chart)args.OldValue)));
+            new PropertyMetadata(null, (d, args) => ((ChartControl)d).SetChartViewsAndCharts()));
         /// <summary>
         /// Gets or sets the Chart
         /// </summary>
@@ -96,7 +81,7 @@ namespace Microcharts.Uno
         /// </summary>
         private static readonly DependencyProperty HardwareAcceleratedProperty = DependencyProperty.Register(nameof(HardwareAccelerated),
             typeof(bool), typeof(ChartControl),
-            new PropertyMetadata(false, (d, args) => ((ChartControl)d).OnHardwareAcceleratedChanged((bool)args.OldValue)));
+            new PropertyMetadata(false, (d, args) => ((ChartControl)d).SetChartViewsAndCharts()));
         /// <summary>
         /// Gets or sets the HardwareAccelerated
         /// </summary>
@@ -106,37 +91,7 @@ namespace Microcharts.Uno
             set => SetValue(HardwareAcceleratedProperty, value);
         }
 
-        private void OnChartViewChanged(ChartView? oldValue = null)
-        {
-            var chartView = ChartView;
-            if (chartView != null)
-            {
-
-            }
-        }
-
-        private void OnChartViewGLChanged(ChartViewGL? oldValue = null)
-        {
-            var chartViewGL = ChartViewGL;
-            if (chartViewGL != null)
-            {
-
-            }
-        }
-
-        private void OnChartChanged(Chart? oldValue = null)
-        {
-            var chart = Chart;
-            if (chart != null)
-            {
-                if (ChartView != null)
-                {
-                    ChartView.Chart = chart;
-                }
-            }
-        }
-
-        private void OnHardwareAcceleratedChanged(bool oldValue)
+        public void SetChartViewsAndCharts()
         {
             var chartView = ChartView;
             var chartViewGL = ChartViewGL;
@@ -164,6 +119,42 @@ namespace Microcharts.Uno
 
             ChartView = chartView;
             ChartViewGL = chartViewGL;
+        }
+
+        private void OnPointerWheelChangedEvent(object sender, PointerRoutedEventArgs e)
+        {
+            var pp = e.GetCurrentPoint(null);
+            int wheelDelta = pp.Properties.MouseWheelDelta;
+
+            if (HardwareAccelerated)
+            {
+                if (ChartViewGL?.Chart != null)
+                    ChartViewGL.Chart.LabelTextSize += wheelDelta / 120f;
+            }
+            else
+            {
+                if (ChartView?.Chart != null)
+                    ChartView.Chart.LabelTextSize += wheelDelta / 120f;
+            }
+        }
+
+        private void OnManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void OnManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+            if (HardwareAccelerated)
+            {
+                if (ChartViewGL?.Chart != null)
+                    ChartViewGL.Chart.LabelTextSize += (float)e.Delta.Translation.Y;
+            }
+            else
+            {
+                if (ChartView?.Chart != null)
+                    ChartView.Chart.LabelTextSize += (float)e.Delta.Translation.Y;
+            }
         }
     }
 }

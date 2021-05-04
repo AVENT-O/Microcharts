@@ -10,6 +10,10 @@
                     <Grid>
                         <ContentPresenter Content="{TemplateBinding ChartView}" />
                         <ContentPresenter Content="{TemplateBinding ChartViewGL}" />
+                        <ContentPresenter x:Name="ContentPresenter"
+                                          Background="Transparent"
+                                          ManipulationMode="All"
+                                          Content="{TemplateBinding Content}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
