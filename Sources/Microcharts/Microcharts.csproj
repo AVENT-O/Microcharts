@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
 
     <PropertyGroup>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -16,25 +16,15 @@
         <Company>Microcharts</Company>
         <Copyright>Copyright 2020</Copyright>
         <PackageIconUrl>https://raw.githubusercontent.com/aloisdeniel/Microcharts/master/Documentation/Logo.png</PackageIconUrl>
-<<<<<<< Updated upstream
-        <TargetFramework>netstandard2.0</TargetFramework>
-=======
-        <TargetFrameworks>netstandard2.0;uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0</TargetFrameworks>
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
->>>>>>> Stashed changes
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DocumentationFile>bin\Debug\$(TargetFramework)\Microcharts.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-<<<<<<< Updated upstream
-        <PackageReference Include="SkiaSharp" Version="2.80.2" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    </ItemGroup>
-
-=======
         <PackageReference Include="SkiaSharp" Version="2.80.3" />
         <PackageReference Include="SkiaSharp.Views" Version="2.80.3" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
@@ -52,7 +42,7 @@
             <Version>2.80.3</Version>
         </PackageReference>
     </ItemGroup>
->>>>>>> Stashed changes
+
     <ItemGroup>
         <Content Update="**\.DS_Store" CopyToPublishDirectory="Never" />
     </ItemGroup>

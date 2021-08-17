@@ -328,8 +328,6 @@ namespace Microcharts
         /// <param name="height">The height.</param>
         public void Draw(SKCanvas canvas, int width, int height)
         {
-<<<<<<< Updated upstream
-=======
             //canvas.RotateDegrees(5);
 
             //canvas.Translate(50, 50);
@@ -344,8 +342,6 @@ namespace Microcharts
                 IsAntialias = false,
             };
             
-
->>>>>>> Stashed changes
             DrawableChartArea = new SKRect(0, 0, width, height);
 
             // Clear just the drawing area to avoid messing up rest of the canvas in case it's shared
@@ -647,11 +643,7 @@ namespace Microcharts
         /// Raises the property change.
         /// </summary>
         /// <param name="property">The property name.</param>
-<<<<<<< Updated upstream
-        protected void RaisePropertyChanged([CallerMemberName] string property = null)
-=======
         protected void RaisePropertyChanged([CallerMemberName]string? property = null)
->>>>>>> Stashed changes
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
@@ -664,11 +656,7 @@ namespace Microcharts
         /// <param name="value">The new value.</param>
         /// <param name="property">The property name.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-<<<<<<< Updated upstream
-        protected bool Set<T>(ref T field, T value, [CallerMemberName] string property = null)
-=======
         protected bool Set<T>(ref T field, T value, [CallerMemberName]string? property = null)
->>>>>>> Stashed changes
         {
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
             field = value;
