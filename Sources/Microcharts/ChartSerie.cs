@@ -23,6 +23,6 @@ namespace Microcharts
         /// <summary>
         /// Gets or sets the entries value for the serie 
         /// </summary>
-        public IEnumerable<ChartEntry> Entries { get; set; }
+        public List<ChartEntry> Entries { get; set; }
     }
 }

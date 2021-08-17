@@ -67,8 +67,14 @@ namespace Microcharts
         public override void DrawContent(SKCanvas canvas, int width, int height)
         {
             pointsPerSerie.Clear();
-            foreach (var s in Series)
+
+            var length = Series.Count;
+
+            for (int i = 0; i < length; ++i)
+            {
+                var s = Series[i];
                 pointsPerSerie.Add(s, new List<SKPoint>());
+            }
 
             base.DrawContent(canvas, width, height);
         }
@@ -78,13 +84,16 @@ namespace Microcharts
         {
             base.OnDrawContentEnd(canvas, itemSize, origin, valueLabelSizes);
 
-            foreach (var pps in pointsPerSerie)
-            {
-                DrawLineArea(canvas, pps.Key, pps.Value.ToArray(), itemSize, origin);
-            }
+            var length = pointsPerSerie.Count;
 
+            for (int i = 0; i < length; ++i)
+            {
+                var pps = pointsPerSerie.ElementAt(i);
+                DrawLineArea(canvas, pps.Key, pps.Value, itemSize, origin);
+            }
             DrawSeriesLine(canvas, itemSize);
             DrawPoints(canvas);
+
             DrawValueLabels(canvas, itemSize, valueLabelSizes);
         }
 
@@ -92,8 +101,12 @@ namespace Microcharts
         {
             if (PointMode != PointMode.None)
             {
-                foreach (var pps in pointsPerSerie)
+                var length = pointsPerSerie.Count;
+
+                for (int j = 0; j < length; ++j)
                 {
+                    var pps = pointsPerSerie.ElementAt(j);
+
                     var entries = pps.Key.Entries.ToArray();
                     for (int i = 0; i < pps.Value.Count; i++)
                     {
@@ -113,8 +126,11 @@ namespace Microcharts
 
             if (valueLabelOption == ValueLabelOption.TopOfElement || valueLabelOption == ValueLabelOption.OverElement)
             {
-                foreach (var pps in pointsPerSerie)
+                var length = pointsPerSerie.Count;
+
+                for (int j = 0; j < length; ++j)
                 {
+                    var pps = pointsPerSerie.ElementAt(j);
                     var entries = pps.Key.Entries.ToArray();
                     for (int i = 0; i < pps.Value.Count; i++)
                     {
@@ -149,28 +165,57 @@ namespace Microcharts
             }
         }
 
+        public void AddRange(List<ChartEntry> list)
+        {
+            Series[0].Entries.AddRange(list);
+
+            int count = Series[0].Entries.Count;
+
+            if (count > MaxNrEnries)
+            {
+                Series[0].Entries.RemoveRange(0, count - MaxNrEnries);
+            };
+
+            Invalidate();
+        }
+
         private void DrawSeriesLine(SKCanvas canvas, SKSize itemSize)
         {
             if (pointsPerSerie.Any() && pointsPerSerie.Values.First().Count > 1 && LineMode != LineMode.None)
             {
-                foreach (var s in Series)
-                {
-                    var points = pointsPerSerie[s].ToArray();
-                    using (var paint = new SKPaint
-                    {
-                        Style = SKPaintStyle.Stroke,
-                        Color = s.Color ?? SKColors.White,
-                        StrokeWidth = LineSize,
-                        IsAntialias = true,
-                    })
-                    {
-                        if (s.Color == null)
-                            using (var shader = CreateXGradient(points, s.Entries, s.Color))
-                                paint.Shader = shader;
+                var length = Series.Count;
 
-                        var path = new SKPath();
+                var path = new SKPath();
+                using var paint2 = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.White,
+                    StrokeWidth = LineSize,
+                    IsAntialias = false,
+                };
+
+                for (int j = 0; j < length; ++j)
+                {
+                    var s = Series[j];
+
+                    var points = pointsPerSerie[s];
+
+                    //using (var paint = new SKPaint
+                    //{
+                    //    Style = SKPaintStyle.Stroke,
+                    //    Color = s.Color ?? SKColors.White,
+                    //    StrokeWidth = LineSize,
+                    //    IsAntialias = true,
+                    //})
+                    {
+
+                        //if (s.Color == null)
+                        //    using (var shader = CreateXGradient(points, s.Entries, s.Color))
+                        //        paint.Shader = shader;
+
+                        //var path = new SKPath();
                         path.MoveTo(points.First());
-                        var last = (LineMode == LineMode.Spline) ? points.Length - 1 : points.Length;
+                        var last = (LineMode == LineMode.Spline) ? points.Count - 1 : points.Count;
                         for (int i = 0; i < last; i++)
                         {
                             if (LineMode == LineMode.Spline)
@@ -183,16 +228,18 @@ namespace Microcharts
                                 path.LineTo(points[i]);
                             }
                         }
-
-                        canvas.DrawPath(path, paint);
+                        //canvas.DrawPath(path, paint);
                     }
                 }
+
+                canvas.Clear();
+                canvas.DrawPath(path, paint2);
             }
         }
 
-        private void DrawLineArea(SKCanvas canvas, ChartSerie serie, SKPoint[] points, SKSize itemSize, float origin)
+        private void DrawLineArea(SKCanvas canvas, ChartSerie serie, List<SKPoint> points, SKSize itemSize, float origin)
         {
-            if (LineAreaAlpha > 0 && points.Length > 1)
+            if (LineAreaAlpha > 0 && points.Count > 1)
             {
                 using (var paint = new SKPaint
                 {
@@ -211,7 +258,7 @@ namespace Microcharts
                         path.MoveTo(points.First().X, origin);
                         path.LineTo(points.First());
 
-                        var last = (LineMode == LineMode.Spline) ? points.Length - 1 : points.Length;
+                        var last = (LineMode == LineMode.Spline) ? points.Count - 1 : points.Count;
                         for (int i = 0; i < last; i++)
                         {
                             if (LineMode == LineMode.Spline)
@@ -245,6 +292,7 @@ namespace Microcharts
         {
             //Drawing entry point at center of the item (label) part
             var point = new SKPoint(itemX, barY);
+            if (pointsPerSerie.ContainsKey(serie))
             pointsPerSerie[serie].Add(point);
         }
 
@@ -254,7 +302,7 @@ namespace Microcharts
             //Area is draw on the OnDrawContentEnd
         }
 
-        private (SKPoint control, SKPoint nextPoint, SKPoint nextControl) CalculateCubicInfo(SKPoint[] points, int i, SKSize itemSize)
+        private (SKPoint control, SKPoint nextPoint, SKPoint nextControl) CalculateCubicInfo(List<SKPoint> points, int i, SKSize itemSize)
         {
             var point = points[i];
             var nextPoint = points[i + 1];
@@ -264,7 +312,7 @@ namespace Microcharts
             return (currentControl, nextPoint, nextControl);
         }
 
-        private SKShader CreateXGradient(SKPoint[] points, IEnumerable<ChartEntry> entries, SKColor? serieColor, byte alpha = 255)
+        private SKShader CreateXGradient(List<SKPoint> points, IEnumerable<ChartEntry> entries, SKColor? serieColor, byte alpha = 255)
         {
             var startX = points.First().X;
             var endX = points.Last().X;
@@ -278,7 +326,7 @@ namespace Microcharts
                 SKShaderTileMode.Clamp);
         }
 
-        private SKShader CreateYGradient(SKPoint[] points, byte alpha = 255)
+        private SKShader CreateYGradient(List<SKPoint> points, byte alpha = 255)
         {
             var startY = points.Max(i => i.Y);
             var endY = 0;

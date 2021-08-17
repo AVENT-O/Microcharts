@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using SkiaSharp;
 
@@ -41,7 +42,7 @@ namespace Microcharts
         #endregion
 
         /// <inheritdoc />
-        protected override void GenerateDefaultSerie(IEnumerable<ChartEntry> value)
+        protected override void GenerateDefaultSerie(List<ChartEntry> value)
         {
             //To maintain a continuity with the previous barchart version,
             //we set properties accordingly to match the previous behaviors
@@ -169,6 +170,8 @@ namespace Microcharts
         {
             if (Series != null && entries != null)
             {
+                var ticks = Environment.TickCount;
+
                 width = MeasureHelper.CalculateYAxis(ShowYAxisText, ShowYAxisLines, entries, YAxisMaxTicks, YAxisTextPaint, YAxisPosition, width, out float yAxisXShift, out List<float> yAxisIntervalLabels);
                 var firstSerie = Series.FirstOrDefault();
                 var labels = firstSerie.Entries.Select(x => x.Label).ToArray();
@@ -190,18 +193,18 @@ namespace Microcharts
                 float headerHeight = CalculateHeaderHeight(valueLabelSizes);
                 var headerWithLegendHeight = headerHeight + (LegendOption == SeriesLegendOption.Top ? legendHeight : 0);
 
-                var itemSize = CalculateItemSize(nbItems, width, height, footerHeight + headerHeight + legendHeight);
+                var itemSize = CalculateItemSize(NrEnries, width, height, footerHeight + headerHeight + legendHeight);
                 var barSize = CalculateBarSize(itemSize, Series.Count());
                 var origin = CalculateYOrigin(itemSize.Height, headerWithLegendHeight);
                 DrawHelper.DrawYAxis(ShowYAxisText, ShowYAxisLines, YAxisPosition, YAxisTextPaint, YAxisLinesPaint, Margin, AnimationProgress, MaxValue, ValueRange, canvas, width, yAxisXShift, yAxisIntervalLabels, headerHeight, itemSize, origin);
 
                 int nbSeries = series.Count();
-                for (int i = 0; i < labels.Length; i++)
+                for (int i = Start; i <= End; i++)
                 {
                     string label = labels[i];
                     SKRect labelSize = labelSizes[i];
 
-                    var itemX = Margin + (itemSize.Width / 2) + (i * (itemSize.Width + Margin));
+                    var itemX = Margin + (itemSize.Width / 2) + ((i - Start) * (itemSize.Width + Margin));
 
                     for (int serieIndex = 0; serieIndex < nbSeries; serieIndex++)
                     {
@@ -218,12 +221,16 @@ namespace Microcharts
                         DrawValueLabel(canvas, valueLabelSizes, headerWithLegendHeight, itemSize, barSize, entry, barX, barY, itemX, origin);
                     }
 
-                    if(!string.IsNullOrEmpty(label))
+                    if (!string.IsNullOrEmpty(label))
                         DrawHelper.DrawLabel(canvas, LabelOrientation, YPositionBehavior.None, itemSize, new SKPoint(itemX, height - footerWithLegendHeight + Margin), LabelColor, labelSize, label, LabelTextSize, Typeface);
                 }
 
                 DrawLegend(canvas, seriesSizes, legendHeight, height, width);
                 OnDrawContentEnd(canvas, itemSize, origin, valueLabelSizes);
+
+                ticks = Environment.TickCount - ticks;
+
+                Debug.WriteLine($"Nr: {labels.Length} Ticks: {ticks}");
             }
         }
 
@@ -252,7 +259,7 @@ namespace Microcharts
         protected virtual void DrawValueLabel(SKCanvas canvas, Dictionary<ChartEntry, SKRect> valueLabelSizes, float headerWithLegendHeight, SKSize itemSize, SKSize barSize, ChartEntry entry, float barX, float barY, float itemX, float origin)
         {
             if (!string.IsNullOrEmpty(entry?.ValueLabel))
-                DrawHelper.DrawLabel(canvas, ValueLabelOrientation, YPositionBehavior.UpToElementHeight, barSize, new SKPoint(barX - (itemSize.Width / 2) + (barSize.Width / 2), headerWithLegendHeight - Margin), entry.ValueLabelColor.WithAlpha((byte)(255 * AnimationProgress)), valueLabelSizes[entry], entry.ValueLabel, ValueLabelTextSize, Typeface);
+                DrawHelper.DrawLabel(canvas, ValueLabelOrientation, YPositionBehavior.UpToElementHeight, barSize, new SKPoint(barX - (itemSize.Width / 2) + (barSize.Width / 2), headerWithLegendHeight - Margin), entry.ValueLabelColor.WithAlpha((byte)(255 * AnimationProgress)), valueLabelSizes.ElementAt(0).Value, entry.ValueLabel, ValueLabelTextSize, Typeface);
         }
 
         /// <summary>
@@ -356,8 +363,13 @@ namespace Microcharts
 
             int nbLine = 1;
             float currentWidthUsed = 0;
-            foreach(var rect in seriesSizes)
+
+            var length = seriesSizes.Length;
+
+            for (int i = 0; i<length; ++i)
             {
+                var rect = seriesSizes[i];
+
                 float legentItemWidth = Margin + serieLabelTextSize + Margin + rect.Width;
                 if (legentItemWidth > width)
                 {
@@ -398,8 +410,13 @@ namespace Microcharts
             using (var paint = new SKPaint())
             {
                 paint.TextSize = ValueLabelTextSize;
-                foreach (var e in entries)
+
+                var length = entries.Count;
+
+                for (int i = 0; i < length; ++i)
                 {
+                    var e = entries[i];
+
                     SKRect bounds;
                     if (string.IsNullOrEmpty(e.ValueLabel))
                     {

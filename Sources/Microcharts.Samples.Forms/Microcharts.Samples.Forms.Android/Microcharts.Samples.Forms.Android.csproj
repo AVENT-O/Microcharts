@@ -50,7 +50,7 @@
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
     <PackageReference Include="SkiaSharp.Views" Version="2.80.2" />
-    <PackageReference Include="SkiaSharp.Views.Forms" Version="2.80.2" />
+    <PackageReference Include="SkiaSharp.Views.Forms" Version="2.80.3-preview.90" />
     <PackageReference Include="Xamarin.AndroidX.CardView" Version="1.0.0.8" />
     <PackageReference Include="Xamarin.AndroidX.Interpolator" Version="1.0.0.7" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />

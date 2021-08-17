@@ -23,7 +23,7 @@ namespace Microcharts
         /// <summary>
         /// IEnumerable of <seealso cref="T:Microcharts.ChartEntry" /> corresponding of Entries of the chart.
         /// </summary>
-        protected IEnumerable<ChartEntry> entries;
+        protected List<ChartEntry> entries;
 
         private float animationProgress, margin = 20, labelTextSize = 16;
 
@@ -204,8 +204,11 @@ namespace Microcharts
                 {
                     return Math.Min(0, entries.Min(x => x.Value));
                 }
-
-                return Math.Min(InternalMinValue.Value, entries.Min(x => x.Value));
+                else
+                {
+                    return (float)InternalMinValue;
+                }
+                //return Math.Min(InternalMinValue.Value, entries.Min(x => x.Value));
             }
 
             set => InternalMinValue = value;
@@ -229,13 +232,41 @@ namespace Microcharts
                 {
                     return Math.Max(0, entries.Max(x => x.Value));
                 }
-
-                return Math.Max(InternalMaxValue.Value, entries.Max(x => x.Value));
+                else
+                {
+                    return (float)InternalMaxValue;
+                }
+                //return Math.Max(InternalMaxValue.Value, entries.Max(x => x.Value));
             }
 
             set => InternalMaxValue = value;
         }
 
+        int maxNrEntries = 50;
+        public int MaxNrEnries          
+        {
+            get => maxNrEntries;
+            set => Set(ref maxNrEntries, value);
+        }
+
+        public int NrEnries
+        {
+            get => end - start + 1;
+        }
+
+        int start = 0;
+        public int Start
+        {
+            get => start;
+            set => Set(ref start, value < 0 ? 0 : (value > end ? end - 1 : value));
+        }
+
+        int end = 49;
+        public int End
+        {
+            get => end;
+            set => Set(ref end, value);
+        }
 
         /// <summary>
         /// Value range of the chart entries
@@ -297,6 +328,24 @@ namespace Microcharts
         /// <param name="height">The height.</param>
         public void Draw(SKCanvas canvas, int width, int height)
         {
+<<<<<<< Updated upstream
+=======
+            //canvas.RotateDegrees(5);
+
+            //canvas.Translate(50, 50);
+            //canvas.Scale(1.8f, 0.5f);
+
+
+            using var paint2 = new SKPaint
+            {
+                Style = SKPaintStyle.Stroke,
+                Color = SKColors.Red,
+                TextSize = 100,
+                IsAntialias = false,
+            };
+            
+
+>>>>>>> Stashed changes
             DrawableChartArea = new SKRect(0, 0, width, height);
 
             // Clear just the drawing area to avoid messing up rest of the canvas in case it's shared
@@ -310,6 +359,8 @@ namespace Microcharts
             }
 
             DrawContent(canvas, width, height);
+
+            canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
         }
 
         /// <summary>
@@ -538,7 +589,7 @@ namespace Microcharts
         /// Base method of the generation items on entries changed
         /// </summary>
         /// <param name="value"></param>
-        protected async void UpdateEntries(IEnumerable<ChartEntry> value)
+        protected async void UpdateEntries(List<ChartEntry> value)
         {
             try
             {
@@ -596,7 +647,11 @@ namespace Microcharts
         /// Raises the property change.
         /// </summary>
         /// <param name="property">The property name.</param>
+<<<<<<< Updated upstream
         protected void RaisePropertyChanged([CallerMemberName] string property = null)
+=======
+        protected void RaisePropertyChanged([CallerMemberName]string? property = null)
+>>>>>>> Stashed changes
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
@@ -609,16 +664,16 @@ namespace Microcharts
         /// <param name="value">The new value.</param>
         /// <param name="property">The property name.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
+<<<<<<< Updated upstream
         protected bool Set<T>(ref T field, T value, [CallerMemberName] string property = null)
+=======
+        protected bool Set<T>(ref T field, T value, [CallerMemberName]string? property = null)
+>>>>>>> Stashed changes
         {
-            if (!EqualityComparer<T>.Equals(field, property))
-            {
-                field = value;
-                RaisePropertyChanged(property);
-                return true;
-            }
-
-            return false;
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            RaisePropertyChanged(property);
+            return true;
         }
 
         #endregion

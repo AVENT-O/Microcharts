@@ -11,7 +11,7 @@ namespace Microcharts
         /// Gets or Sets Entries
         /// </summary>
         /// <value>IEnumerable of <seealso cref="T:Microcharts.ChartEntry"/></value>
-        public IEnumerable<ChartEntry> Entries
+        public List<ChartEntry> Entries
         {
             get => entries;
             set => UpdateEntries(value);
