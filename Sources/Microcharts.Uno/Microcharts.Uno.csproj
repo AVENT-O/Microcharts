@@ -49,4 +49,20 @@
     <ItemGroup>
         <UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Themes\ChartControl.xaml" />
+      <None Remove="Themes\Generic.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Themes\ChartControl.xaml" />
+      <UpToDateCheckInput Remove="Themes\Generic.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+      <Page Update="Themes\ChartControl.xaml">
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Themes\Generic.xaml">
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
 </Project>
