@@ -16,7 +16,7 @@
         <Company>Microcharts</Company>
         <Copyright>Copyright 2020</Copyright>
         <PackageIconUrl>https://raw.githubusercontent.com/aloisdeniel/Microcharts/master/Documentation/Logo.png</PackageIconUrl>
-        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0;Xamarin.Mac20</TargetFrameworks>
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
