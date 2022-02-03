@@ -242,7 +242,7 @@ namespace Microcharts
             set => InternalMaxValue = value;
         }
 
-        int maxNrEntries = 50;
+        int maxNrEntries = 5000;
         public int MaxNrEnries          
         {
             get => maxNrEntries;
@@ -261,7 +261,7 @@ namespace Microcharts
             set => Set(ref start, value < 0 ? 0 : (value > end ? end - 1 : value));
         }
 
-        int end = 49;
+        int end = 4999;
         public int End
         {
             get => end;
@@ -333,30 +333,37 @@ namespace Microcharts
             //canvas.Translate(50, 50);
             //canvas.Scale(1.8f, 0.5f);
 
-
-            using var paint2 = new SKPaint
-            {
-                Style = SKPaintStyle.Stroke,
-                Color = SKColors.Red,
-                TextSize = 100,
-                IsAntialias = false,
-            };
+            //using var paint2 = new SKPaint
+            //{
+            //    Style = SKPaintStyle.Stroke,
+            //    Color = SKColors.Red,
+            //    TextSize = 100,
+            //    IsAntialias = false,
+            //};
             
             DrawableChartArea = new SKRect(0, 0, width, height);
 
-            // Clear just the drawing area to avoid messing up rest of the canvas in case it's shared
-            using (var paint = new SKPaint
+
+            if (BackgroundColor == SKColors.Transparent)
             {
-                Style = SKPaintStyle.Fill,
-                Color = BackgroundColor
-            })
+                canvas.Clear();
+            }
+            else
             {
-                canvas.DrawRect(DrawableChartArea, paint);
+                // Clear just the drawing area to avoid messing up rest of the canvas in case it's shared
+                using (var paint = new SKPaint
+                {
+                    Style = SKPaintStyle.Fill,
+                    Color = BackgroundColor
+                })
+                {
+                    canvas.DrawRect(DrawableChartArea, paint);
+                }
             }
 
             DrawContent(canvas, width, height);
 
-            canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
+            //canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
         }
 
         /// <summary>

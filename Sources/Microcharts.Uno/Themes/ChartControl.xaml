@@ -6,9 +6,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:ChartControl">
-                    <Grid>
-                        <ContentPresenter Content="{TemplateBinding ChartView}" />
-                        <ContentPresenter Content="{TemplateBinding ChartViewGL}" />
+                    <Grid Background="{ThemeResource MyBackgroundThemeBrush}">
+                        <ContentPresenter x:Name="ContentPresenterChartView" Content="{TemplateBinding ChartView}" />
+                        <ContentPresenter x:Name="ContentPresenterChartViewGL" Content="{TemplateBinding ChartViewGL}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

@@ -1,5 +1,4 @@
 using System;
-using Windows.ApplicationModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -23,13 +22,26 @@ namespace Microcharts.Uno
 
             SetChartViewsAndCharts();
 
-            if (GetTemplateChild("ContentPresenter") is UIElement contentGrid)
+            if (GetTemplateChild("ContentPresenterChartViewGL") is UIElement contentGridChartViewGL)
             {
-                //contentGrid.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
-                //contentGrid.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
-                contentGrid.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
-                contentGrid.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
-                contentGrid.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnPointerWheelChangedEvent), true);
+                //contentGridChartViewGL.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                //contentGridChartViewGL.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
+                contentGridChartViewGL.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
+                contentGridChartViewGL.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
+#if NETFX_CORE
+                contentGridChartViewGL.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnPointerWheelChangedEvent), true);
+#endif
+            }
+
+            if (GetTemplateChild("ContentPresenterChartView") is UIElement contentGridChartView)
+            {
+                //contentGridChartView.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                //contentGridChartView.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
+                contentGridChartView.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
+                contentGridChartView.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
+#if NETFX_CORE
+                contentGridChartView.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnPointerWheelChangedEvent), true);
+#endif
             }
         }
 

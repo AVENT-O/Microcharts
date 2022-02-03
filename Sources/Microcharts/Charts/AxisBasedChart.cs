@@ -216,21 +216,20 @@ namespace Microcharts
                         float barX = itemX + serieIndex * barSize.Width + totalBarMarge;
                         float barY = headerWithLegendHeight + ((1 - AnimationProgress) * (origin - headerWithLegendHeight) + (((MaxValue - value) / ValueRange) * itemSize.Height) * AnimationProgress);
 
-                        DrawBarArea(canvas, headerWithLegendHeight, itemSize, barSize, serie.Color ?? entry.Color, origin, value, barX, barY);
+                        //DrawBarArea(canvas, headerWithLegendHeight, itemSize, barSize, serie.Color ?? entry.Color, origin, value, barX, barY);
                         DrawBar(serie, canvas, headerWithLegendHeight, itemX, itemSize, barSize, origin, barX, barY, serie.Color ?? entry.Color);
-                        DrawValueLabel(canvas, valueLabelSizes, headerWithLegendHeight, itemSize, barSize, entry, barX, barY, itemX, origin);
+                        //DrawValueLabel(canvas, valueLabelSizes, headerWithLegendHeight, itemSize, barSize, entry, barX, barY, itemX, origin);
                     }
 
-                    if (!string.IsNullOrEmpty(label))
-                        DrawHelper.DrawLabel(canvas, LabelOrientation, YPositionBehavior.None, itemSize, new SKPoint(itemX, height - footerWithLegendHeight + Margin), LabelColor, labelSize, label, LabelTextSize, Typeface);
+                    //if (!string.IsNullOrEmpty(label))
+                    //    DrawHelper.DrawLabel(canvas, LabelOrientation, YPositionBehavior.None, itemSize, new SKPoint(itemX, height - footerWithLegendHeight + Margin), LabelColor, labelSize, label, LabelTextSize, Typeface);
                 }
 
                 DrawLegend(canvas, seriesSizes, legendHeight, height, width);
                 OnDrawContentEnd(canvas, itemSize, origin, valueLabelSizes);
 
                 ticks = Environment.TickCount - ticks;
-
-                Debug.WriteLine($"Nr: {labels.Length} Ticks: {ticks}");
+                //Debug.WriteLine($"Nr: {labels.Length} Ticks: {ticks}");
             }
         }
 

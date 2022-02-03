@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
+<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
 
     <PropertyGroup>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -16,7 +16,7 @@
         <Company>Microcharts</Company>
         <Copyright>Copyright 2020</Copyright>
         <PackageIconUrl>https://raw.githubusercontent.com/aloisdeniel/Microcharts/master/Documentation/Logo.png</PackageIconUrl>
-        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0;Xamarin.Mac20</TargetFrameworks>
+        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0</TargetFrameworks>
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -25,21 +25,19 @@
         <DocumentationFile>bin\Debug\$(TargetFramework)\Microcharts.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="SkiaSharp" Version="2.80.3" />
-        <PackageReference Include="SkiaSharp.Views" Version="2.80.3" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+        <PackageReference Include="SkiaSharp">
+            <Version>2.88.0-preview.179</Version>
+        </PackageReference>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views.Uno">
-            <Version>2.80.3</Version>
+            <Version>2.88.0-preview.179</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'=='uap10.0.18362'">
-        <PackageReference Include="SkiaSharp">
-            <Version>2.80.3</Version>
-        </PackageReference>
         <PackageReference Include="SkiaSharp.Views">
-            <Version>2.80.3</Version>
+            <Version>2.88.0-preview.179</Version>
         </PackageReference>
     </ItemGroup>
 

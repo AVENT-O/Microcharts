@@ -179,6 +179,20 @@ namespace Microcharts
             Invalidate();
         }
 
+        public void Add(ChartEntry chartEntry)
+        {
+            Series[0].Entries.Add(chartEntry);
+
+            int count = Series[0].Entries.Count;
+
+            if (count > MaxNrEnries)
+            {
+                Series[0].Entries.RemoveRange(0, count - MaxNrEnries);
+            };
+
+            Invalidate();
+        }
+
         private void DrawSeriesLine(SKCanvas canvas, SKSize itemSize)
         {
             if (pointsPerSerie.Any() && pointsPerSerie.Values.First().Count > 1 && LineMode != LineMode.None)
@@ -189,9 +203,9 @@ namespace Microcharts
                 using var paint2 = new SKPaint
                 {
                     Style = SKPaintStyle.Stroke,
-                    Color = SKColors.White,
+                    Color = SKColors.Red,
                     StrokeWidth = LineSize,
-                    IsAntialias = false,
+                    IsAntialias = true,
                 };
 
                 for (int j = 0; j < length; ++j)
@@ -232,7 +246,7 @@ namespace Microcharts
                     }
                 }
 
-                canvas.Clear();
+                //canvas.Clear();
                 canvas.DrawPath(path, paint2);
             }
         }

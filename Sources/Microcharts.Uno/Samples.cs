@@ -60,7 +60,7 @@ namespace Microcharts.Uno
 
         public static LineChart CreateChart2()
         {
-            int nrEntries = 50;
+            int nrEntries = 5000;
             float maxValue = 100f;
 
             var entriesList = new List<ChartEntry>(nrEntries);
@@ -86,7 +86,9 @@ namespace Microcharts.Uno
                 ValueLabelTextSize = 10,
                 LabelTextSize = 10,
                 LabelOrientation = Orientation.Horizontal,
-                Margin = 10
+                Margin = 10,
+                BackgroundColor = SKColors.Transparent,
+                PointMode = PointMode.None
             };
         }
     }

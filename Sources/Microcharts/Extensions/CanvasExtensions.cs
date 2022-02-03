@@ -1,4 +1,4 @@
-﻿// Copyright (c) Aloïs DENIEL. All rights reserved.
+// Copyright (c) Aloïs DENIEL. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using SkiaSharp;
@@ -95,7 +95,7 @@ namespace Microcharts
             {
                 Style = SKPaintStyle.Fill,
                 IsAntialias = true,
-                Color = color,
+                Color = SKColors.Red
             })
             {
                 switch (mode)

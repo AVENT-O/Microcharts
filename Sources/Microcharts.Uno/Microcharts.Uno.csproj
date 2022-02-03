@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="MSBuild.Sdk.Extras/2.0.54">
-
+    
     <PropertyGroup>
         <RootNamespace>Microcharts.Uno</RootNamespace>
         <PackageId>Microcharts.Uno</PackageId>
@@ -12,33 +12,32 @@
     Please see https://github.com/unoplatform/uno/issues/3909 for more details.
     -->
     <PropertyGroup>
-        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0;Xamarin.Mac20</TargetFrameworks>
+        <TargetFrameworks>xamarinios10;MonoAndroid11.0;monoandroid10.0;uap10.0.18362</TargetFrameworks>
         <!-- Ensures the .xr.xml files are generated in a proper layout folder -->
         <GenerateLibraryLayout>true</GenerateLibraryLayout>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="SkiaSharp" Version="2.80.3" />
-        <PackageReference Include="SkiaSharp.Views" Version="2.80.3" />
-        <PackageReference Include="Uno.UI" Version="3.11.6" />
+        <PackageReference Include="Uno.UI" Version="4.0.13" />
+        <PackageReference Include="Uno.Core" Version="4.0.1" />
+        <PackageReference Include="SkiaSharp">
+            <Version>2.88.0-preview.179</Version>
+        </PackageReference>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
+        <PackageReference Include="SkiaSharp.Views.Uno">
+            <Version>2.88.0-preview.179</Version>
+        </PackageReference>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='uap10.0.18362'">
+        <PackageReference Include="SkiaSharp.Views">
+            <Version>2.88.0-preview.179</Version>
+        </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Microcharts\Microcharts.csproj">
             <Project>{de24e243-1c2c-4923-8b2e-53f7b2abc814}</Project>
             <Name>Microcharts</Name>
         </ProjectReference>
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
-        <PackageReference Include="SkiaSharp.Views.Uno">
-            <Version>2.80.3</Version>
-        </PackageReference>
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'=='uap10.0.18362'">
-        <PackageReference Include="SkiaSharp">
-            <Version>2.80.3</Version>
-        </PackageReference>
-        <PackageReference Include="SkiaSharp.Views">
-            <Version>2.80.3</Version>
-        </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
