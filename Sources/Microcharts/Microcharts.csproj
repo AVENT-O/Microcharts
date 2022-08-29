@@ -25,11 +25,12 @@
         <DocumentationFile>bin\Debug\$(TargetFramework)\Microcharts.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="SkiaSharp.Views.Uno" Version="2.88.0" />
+        <PackageReference Include="SkiaSharp.Views.Uno" Version="2.88.1" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="SkiaSharp">
-            <Version>2.88.0</Version>
+            <Version>2.88.1</Version>
         </PackageReference>
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="4.1.0" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views.Uno">
@@ -38,7 +39,7 @@
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'=='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views">
-            <Version>2.88.0</Version>
+            <Version>2.88.1</Version>
         </PackageReference>
     </ItemGroup>
 
