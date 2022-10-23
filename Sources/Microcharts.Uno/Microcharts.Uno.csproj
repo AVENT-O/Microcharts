@@ -19,7 +19,7 @@
     <ItemGroup>
         <PackageReference Include="SkiaSharp.Views" Version="2.88.3" />
         <PackageReference Include="Uno.SourceGenerationTasks" Version="4.1.0" />
-        <PackageReference Include="Uno.UI" Version="4.5.12" />
+        <PackageReference Include="Uno.UI" Version="4.5.14" />
         <PackageReference Include="Uno.Core" Version="4.0.1" />
         <PackageReference Include="SkiaSharp">
             <Version>2.88.3</Version>
