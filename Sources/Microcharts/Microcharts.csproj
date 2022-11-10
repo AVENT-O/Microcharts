@@ -16,7 +16,7 @@
         <Company>Microcharts</Company>
         <Copyright>Copyright 2020</Copyright>
         <PackageIconUrl>https://raw.githubusercontent.com/aloisdeniel/Microcharts/master/Documentation/Logo.png</PackageIconUrl>
-        <TargetFrameworks>uap10.0.18362;xamarinios10;MonoAndroid11.0;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks>uap10.0.18362;xamarinios10;monoandroid12.0</TargetFrameworks>
         <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -30,7 +30,7 @@
         <PackageReference Include="SkiaSharp">
             <Version>2.88.3</Version>
         </PackageReference>
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="4.1.0" />
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="4.2.0" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views.Uno">
