@@ -117,7 +117,7 @@ namespace Microcharts.Uno
                     chartView.Chart = null;
                     chartView = null;
                 }
-                if (chartViewGL == null) chartViewGL = new ChartViewGL();
+                chartViewGL ??= new ChartViewGL();
                 chartViewGL.Chart = Chart;
             }
             else
@@ -127,7 +127,7 @@ namespace Microcharts.Uno
                     chartViewGL.Chart = null;
                     chartViewGL = null;
                 }
-                if (chartView == null) chartView = new ChartView();
+                chartView ??= new ChartView();
                 chartView.Chart = Chart;
             }
 
@@ -135,6 +135,7 @@ namespace Microcharts.Uno
             ChartViewGL = chartViewGL;
         }
 
+#if NETFX_CORE
         private void OnPointerWheelChangedEvent(object sender, PointerRoutedEventArgs e)
         {
             var pp = e.GetCurrentPoint(null);
@@ -151,6 +152,7 @@ namespace Microcharts.Uno
                     ChartView.Chart.LabelTextSize += wheelDelta / 120f;
             }
         }
+#endif
 
         private void OnManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {

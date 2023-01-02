@@ -10,11 +10,11 @@ namespace Microcharts.Uno
     using System;
     using Windows.UI.Xaml;
 
-    public partial class ChartViewGL : SKSwapChainPanel
+    public partial class MapView : SKXamlCanvas
     {
         #region Constructors
 
-        public ChartViewGL()
+        public MapView()
         {
             this.PaintSurface += OnPaintCanvas;
         }
@@ -24,14 +24,14 @@ namespace Microcharts.Uno
         #region Static fields
 
         public static readonly DependencyProperty ChartProperty = DependencyProperty.Register(nameof(Chart),
-            typeof(Chart), typeof(ChartViewGL),
-            new PropertyMetadata(null, (d, args) => ((ChartViewGL)d).OnChartChanged(d, args)));
+            typeof(Chart), typeof(ChartView),
+            new PropertyMetadata(null, (d, args) => ((MapView)d).OnChartChanged(d, args)));
 
         #endregion
 
         #region Fields
 
-        private InvalidatedWeakEventHandler<ChartViewGL>? handler;
+        private InvalidatedWeakEventHandler<MapView>? handler;
 
         private Chart? chart;
 
@@ -53,7 +53,7 @@ namespace Microcharts.Uno
         {
             try
             {
-                var view = d as ChartViewGL;
+                var view = d as MapView;
 
                 if (view == null) return;
 
@@ -77,13 +77,13 @@ namespace Microcharts.Uno
             }
         }
 
-        private void OnPaintCanvas(object sender, SKPaintGLSurfaceEventArgs e)
+        private void OnPaintCanvas(object sender, SKPaintSurfaceEventArgs e)
         {
             try
             {
                 if (this.chart != null)
                 {
-                    this.chart.Draw(e.Surface.Canvas, e.BackendRenderTarget.Width, e.BackendRenderTarget.Height);
+                    this.chart.Draw(e.Surface.Canvas, e.Info.Width, e.Info.Height);
                 }
                 else
                 {
@@ -96,7 +96,7 @@ namespace Microcharts.Uno
             }
         }
 
-        public static implicit operator ChartViewGL(LineChart v)
+        public static implicit operator MapView(MapChart v)
         {
             throw new NotImplementedException();
         }

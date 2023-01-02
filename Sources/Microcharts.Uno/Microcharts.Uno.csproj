@@ -32,7 +32,7 @@
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'=='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views">
-            <Version>2.88.2</Version>
+            <Version>2.88.3</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
@@ -53,10 +53,12 @@
     <ItemGroup>
       <None Remove="Themes\ChartControl.xaml" />
       <None Remove="Themes\Generic.xaml" />
+      <None Remove="Themes\MapControl.xaml" />
     </ItemGroup>
     <ItemGroup>
       <UpToDateCheckInput Remove="Themes\ChartControl.xaml" />
       <UpToDateCheckInput Remove="Themes\Generic.xaml" />
+      <UpToDateCheckInput Remove="Themes\MapControl.xaml" />
     </ItemGroup>
     <ItemGroup>
       <Page Update="Themes\ChartControl.xaml">

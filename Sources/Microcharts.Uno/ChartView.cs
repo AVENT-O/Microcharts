@@ -31,15 +31,15 @@ namespace Microcharts.Uno
 
         #region Fields
 
-        private InvalidatedWeakEventHandler<ChartView> handler;
+        private InvalidatedWeakEventHandler<ChartView>? handler;
 
-        private Chart chart;
+        private Chart? chart;
 
         #endregion
 
         #region Properties
 
-        public Chart Chart
+        public Chart? Chart
         {
             get { return (Chart)GetValue(ChartProperty); }
             set { SetValue(ChartProperty, value); }
@@ -55,9 +55,11 @@ namespace Microcharts.Uno
             {
                 var view = d as ChartView;
 
+                if (view == null) return;
+
                 if (view.chart != null)
                 {
-                    view.handler.Dispose();
+                    view.handler?.Dispose();
                     view.handler = null;
                 }
 
