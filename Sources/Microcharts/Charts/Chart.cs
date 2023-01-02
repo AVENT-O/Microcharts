@@ -5,11 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
+using SkiaSharp.Views.UWP;
+using Svg.Skia;
+using Windows.Storage;
 
 namespace Microcharts
 {
@@ -18,6 +22,19 @@ namespace Microcharts
     /// </summary>
     public abstract class Chart : INotifyPropertyChanged
     {
+        public SKSvg Svg { get; set; }
+
+        public async Task LoadSvg(string svgName)
+        {
+            // create a new SVG object
+            Svg = new SKSvg();
+
+            var storageFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(svgName));
+            var randomAccessStream = await storageFile.OpenAsync(FileAccessMode.Read);
+
+            Svg.Load(randomAccessStream.AsStream());
+        }
+
         #region Fields
 
         /// <summary>
@@ -362,6 +379,27 @@ namespace Microcharts
             }
 
             DrawContent(canvas, width, height);
+
+            if (Svg != null && Svg.Picture != null)
+            {
+                //var surface = e.Surface;
+                //var canvas = surface.Canvas;
+
+                //var width = e.Info.Width;
+                //var height = e.Info.Height;
+
+                // clear the surface
+                //canvas.Clear(SKColors.White);
+
+                // calculate the scaling need to fit to screen
+                float canvasMin = Math.Min(width, height);
+                float svgMax = Math.Max(Svg.Picture.CullRect.Width, Svg.Picture.CullRect.Height);
+                float scale = canvasMin / svgMax;
+                var matrix = SKMatrix.CreateScale(scale, scale);
+
+                // draw the svg
+                canvas.DrawPicture(Svg.Picture, ref matrix);
+            }
 
             //canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
         }

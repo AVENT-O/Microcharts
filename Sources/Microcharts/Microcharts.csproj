@@ -26,6 +26,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="SkiaSharp.Views.Uno" Version="2.88.3" />
+        <PackageReference Include="Svg.Skia" Version="0.5.18" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="SkiaSharp">
             <Version>2.88.3</Version>

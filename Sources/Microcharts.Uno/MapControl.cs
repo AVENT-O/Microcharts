@@ -22,6 +22,14 @@ namespace Microcharts.Uno
 
             SetMapViewsAndCharts();
 
+            if (GetTemplateChild("ContentPresenterMapViewGL") is UIElement contentGridMapViewGL)
+            {
+                //contentGridMapViewGL.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                //contentGridMapViewGL.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
+                contentGridMapViewGL.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
+                contentGridMapViewGL.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
+            }
+
             if (GetTemplateChild("ContentPresenterMapView") is UIElement contentGridMapView)
             {
                 //contentGridMapView.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
@@ -44,6 +52,21 @@ namespace Microcharts.Uno
         {
             get => (MapView)GetValue(MapViewProperty);
             set => SetValue(MapViewProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="MapViewGL"/> dependency property
+        /// </summary>
+        private static readonly DependencyProperty MapViewGLProperty = DependencyProperty.Register(nameof(MapViewGL),
+            typeof(MapViewGL), typeof(MapControl),
+            new PropertyMetadata(null, (d, args) => ((MapControl)d).SetMapViewsAndCharts()));
+        /// <summary>
+        /// Gets or sets the MapViewGL
+        /// </summary>
+        public MapViewGL? MapViewGL
+        {
+            get => (MapViewGL)GetValue(MapViewGLProperty);
+            set => SetValue(MapViewGLProperty, value);
         }
 
         /// <summary>
@@ -81,11 +104,31 @@ namespace Microcharts.Uno
             if (Chart == null) return;
 
             var chartView = MapView;
+            var chartViewGL = MapViewGL;
 
-            chartView ??= new MapView();
-            chartView.Chart = Chart;
+            if (HardwareAccelerated)
+            {
+                if (chartView != null)
+                {
+                    chartView.Chart = null;
+                    chartView = null;
+                }
+                chartViewGL ??= new MapViewGL();
+                chartViewGL.Chart = Chart;
+            }
+            else
+            {
+                if (chartViewGL != null)
+                {
+                    chartViewGL.Chart = null;
+                    chartViewGL = null;
+                }
+                chartView ??= new MapView();
+                chartView.Chart = Chart;
+            }
 
             MapView = chartView;
+            MapViewGL = chartViewGL;
         }
 
         private void OnManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)

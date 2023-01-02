@@ -88,17 +88,20 @@ namespace Microcharts.Uno
             };
         }
 
-        public static MapChart CreateMapChart()
+        public static MapChart CreateMapChart(bool addEntries = false)
         {
             int nrEntries = 5000;
             float maxValue = 100f;
 
             var entriesList = new List<ChartEntry>(nrEntries);
 
-            for (int i = 0; i < nrEntries; i = i + 2)
+            if (addEntries )
             {
-                entriesList.Add(new ChartEntry(0) { ValueLabel = "a", Label = "1" });
-                entriesList.Add(new ChartEntry(i * maxValue / nrEntries - 100 * (float)Math.Sin(0.0001 * i)) { ValueLabel = "a", Label = "1" });
+                for (int i = 0; i < nrEntries; i = i + 2)
+                {
+                    entriesList.Add(new ChartEntry(0) { ValueLabel = "a", Label = "1" });
+                    entriesList.Add(new ChartEntry(i * maxValue / nrEntries - 100 * (float)Math.Sin(0.0001 * i)) { ValueLabel = "a", Label = "1" });
+                }
             }
 
             return new MapChart

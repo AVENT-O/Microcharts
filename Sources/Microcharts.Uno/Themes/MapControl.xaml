@@ -8,6 +8,7 @@
                 <ControlTemplate TargetType="local:MapControl">
                     <Grid Background="{ThemeResource MyBackgroundThemeBrush}">
                         <ContentPresenter x:Name="ContentPresenterMapView" Content="{TemplateBinding MapView}" />
+                        <ContentPresenter x:Name="ContentPresenterMapViewGL" Content="{TemplateBinding MapViewGL}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

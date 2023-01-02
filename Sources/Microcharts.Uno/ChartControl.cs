@@ -107,6 +107,8 @@ namespace Microcharts.Uno
 
         public void SetChartViewsAndCharts()
         {
+            if (Chart == null) return;
+
             var chartView = ChartView;
             var chartViewGL = ChartViewGL;
 
