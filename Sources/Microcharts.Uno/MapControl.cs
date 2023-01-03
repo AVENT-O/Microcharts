@@ -28,6 +28,9 @@ namespace Microcharts.Uno
                 //contentGridMapViewGL.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
                 contentGridMapViewGL.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
                 contentGridMapViewGL.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
+#if NETFX_CORE
+                contentGridMapViewGL.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnPointerWheelChangedEvent), true);
+#endif
             }
 
             if (GetTemplateChild("ContentPresenterMapView") is UIElement contentGridMapView)
@@ -36,6 +39,9 @@ namespace Microcharts.Uno
                 //contentGridMapView.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
                 contentGridMapView.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
                 contentGridMapView.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
+#if NETFX_CORE
+                contentGridMapView.AddHandler(PointerWheelChangedEvent, new PointerEventHandler(OnPointerWheelChangedEvent), true);
+#endif
             }
         }
 
@@ -131,6 +137,27 @@ namespace Microcharts.Uno
             MapViewGL = chartViewGL;
         }
 
+        private void OnPointerWheelChangedEvent(object sender, PointerRoutedEventArgs e)
+        {
+            var pp = e.GetCurrentPoint(null);
+            int wheelDelta = pp.Properties.MouseWheelDelta;
+
+            if (wheelDelta == 0) return;
+
+            var scale = wheelDelta < 0 ? 0.9f : 1.1f;
+
+            if (HardwareAccelerated)
+            {
+                if (MapViewGL?.Chart != null)
+                    MapViewGL.Chart.MapScale *= scale;
+            }
+            else
+            {
+                if (MapView?.Chart != null)
+                    MapView.Chart.MapScale *= scale;
+            }
+        }
+
         private void OnManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
             e.Handled = true;
@@ -138,7 +165,12 @@ namespace Microcharts.Uno
 
         private void OnManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
-            if (MapView?.Chart != null)
+            if (HardwareAccelerated && MapViewGL?.Chart != null)
+            {
+                MapViewGL.Chart.MaxValue += (float)e.Delta.Translation.Y;
+                MapViewGL.Chart.Start += (int)Math.Round(e.Delta.Translation.X);
+            }
+            else if (MapView?.Chart != null)
             {
                 MapView.Chart.MaxValue += (float)e.Delta.Translation.Y;
                 MapView.Chart.Start += (int)Math.Round(e.Delta.Translation.X);

@@ -42,7 +42,7 @@ namespace Microcharts
         /// </summary>
         protected List<ChartEntry> entries;
 
-        private float animationProgress, margin = 20, labelTextSize = 16;
+        private float animationProgress, margin = 20, labelTextSize = 16, mapScale = 1;
 
         private SKColor backgroundColor = SKColors.White;
 
@@ -164,6 +164,19 @@ namespace Microcharts
             {
                 Set(ref labelTextSize, value);
                 OnLabelTextSizeChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the text size of the labels.
+        /// </summary>
+        /// <value>The size of the label text.</value>
+        public float MapScale
+        {
+            get => mapScale;
+            set
+            {
+                Set(ref mapScale, value);
             }
         }
 
@@ -394,7 +407,7 @@ namespace Microcharts
                 // calculate the scaling need to fit to screen
                 float canvasMin = Math.Min(width, height);
                 float svgMax = Math.Max(Svg.Picture.CullRect.Width, Svg.Picture.CullRect.Height);
-                float scale = canvasMin / svgMax;
+                float scale = canvasMin / svgMax * mapScale;
                 var matrix = SKMatrix.CreateScale(scale, scale);
 
                 // draw the svg
@@ -520,12 +533,14 @@ namespace Microcharts
             switch (e.PropertyName)
             {
                 case nameof(AnimationProgress):
+                case nameof(MapScale):
                     Invalidate();
                     break;
                 case nameof(LabelTextSize):
                 case nameof(MaxValue):
                 case nameof(MinValue):
                 case nameof(BackgroundColor):
+                
                     PlanifyInvalidate();
                     break;
                 default:

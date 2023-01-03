@@ -23,7 +23,7 @@ namespace Microcharts.Uno
 
         #region Static fields
 
-        public static readonly DependencyProperty ChartProperty = DependencyProperty.Register(nameof(Chart),
+        public static readonly DependencyProperty ChartProperty = DependencyProperty.Register("ChartMap",
             typeof(Chart), typeof(ChartView),
             new PropertyMetadata(null, (d, args) => ((MapView)d).OnChartChanged(d, args)));
 

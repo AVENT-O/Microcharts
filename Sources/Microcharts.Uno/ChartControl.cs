@@ -137,7 +137,6 @@ namespace Microcharts.Uno
             ChartViewGL = chartViewGL;
         }
 
-#if NETFX_CORE
         private void OnPointerWheelChangedEvent(object sender, PointerRoutedEventArgs e)
         {
             var pp = e.GetCurrentPoint(null);
@@ -154,7 +153,6 @@ namespace Microcharts.Uno
                     ChartView.Chart.LabelTextSize += wheelDelta / 120f;
             }
         }
-#endif
 
         private void OnManipulationStarted(object sender, ManipulationStartedRoutedEventArgs e)
         {
