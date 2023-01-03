@@ -410,6 +410,10 @@ namespace Microcharts
                 float scale = canvasMin / svgMax * mapScale;
                 var matrix = SKMatrix.CreateScale(scale, scale);
 
+                //var x = Svg.Model.Commands.ToList()[4];
+
+                //var y = ((ShimSkiaSharp.DrawPathCanvasCommand)x).Path;
+
                 // draw the svg
                 canvas.DrawPicture(Svg.Picture, ref matrix);
             }
