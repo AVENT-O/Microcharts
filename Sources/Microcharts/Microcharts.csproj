@@ -30,7 +30,6 @@
         <PackageReference Include="SkiaSharp">
             <Version>2.88.3</Version>
         </PackageReference>
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="4.2.0" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views.Uno">
