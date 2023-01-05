@@ -38,7 +38,7 @@ namespace Microcharts
 
             Svg.Load(randomAccessStream.AsStream());
 
-            SKPathColorPitches = new ObservableCollection<(SKPath, SKColor)>();
+            SKPathColorPitches = new ObservableCollection<(SKPath, SKColor, bool, bool)>();
 
             if (Svg.SvgPathPitches != null)
             {
@@ -46,7 +46,7 @@ namespace Microcharts
                 {
                     var path = x.PathData.ToPath(SvgFillRule.EvenOdd);
 
-                    SKPathColorPitches.Add((path, SvgExtensions.GetColor((SvgColourServer)x.Fill)));
+                    SKPathColorPitches.Add((path, SvgExtensions.GetColor((SvgColourServer)x.Fill), false, false));
                 }
             }
         }
@@ -433,20 +433,35 @@ namespace Microcharts
                 // draw the svg
                 //canvas.DrawPicture(Svg.Picture, ref matrix);
 
-                foreach (var sKPath in SKPathColorPitches)
+                foreach (var sKObject in SKPathColorPitches)
                 {
-                    var skPath2 = new SKPath(sKPath.Item1);
+                    var skPath = new SKPath(sKObject.Item1);
 
-                    skPath2.Transform(matrix);
+                    skPath.Transform(matrix);
+
+                    var color = sKObject.Item3 ? new SKColor(sKObject.Item2.Red, sKObject.Item2.Green, sKObject.Item2.Blue, 155) : sKObject.Item2;
 
                     using var paint = new SKPaint
                     {
                         Style = SKPaintStyle.Fill,
-                        Color = sKPath.Item2,
+                        Color = color,
                         IsAntialias = true,
                     };
 
-                    canvas.DrawPath(skPath2, paint);
+                    canvas.DrawPath(skPath, paint);
+
+                    if (sKObject.Item3)
+                    {
+                        using var paintBorder = new SKPaint
+                        {
+                            Style = SKPaintStyle.Stroke,
+                            Color = SKColors.Blue,
+                            StrokeWidth = 2,
+                            IsAntialias = true,
+                        };
+
+                        canvas.DrawPath(skPath, paintBorder);
+                    }
                 }
             }
 
@@ -459,30 +474,53 @@ namespace Microcharts
 
             for (int i = SKPathColorPitches.Count - 1; i >= 0; --i )
             {
-                var skPath2 = new SKPath(SKPathColorPitches[i].Item1);
+                var skObject = SKPathColorPitches[i];
 
-                skPath2.Transform(matrix);
+                var skPath = new SKPath(skObject.Item1);
 
-                var color = SKPathColorPitches[i].Item2;
+                skPath.Transform(matrix);
 
-                if (skPath2.Contains(posx, posy) && !found)
+                if (skPath.Contains(posx, posy) && !found)
                 {
-                    
-                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, color.Green, color.Blue, 100));
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, true, true);
                     found = true;
                 }
                 else
                 {
-                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, color.Green, color.Blue, 255));
-
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, false, false);
                 }
-                PlanifyInvalidate();
             }
+            PlanifyInvalidate();
+        }
+
+        public void HoverSKPath(float posx, float posy)
+        {
+            bool found = false;
+
+            for (int i = SKPathColorPitches.Count - 1; i >= 0; --i)
+            {
+                var skObject = SKPathColorPitches[i];
+
+                var skPath = new SKPath(skObject.Item1);
+
+                skPath.Transform(matrix);
+
+                if (skPath.Contains(posx, posy) && !found)
+                {
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, true);
+                    found = true;
+                }
+                else
+                {
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, false);
+                }
+            }
+            PlanifyInvalidate();
         }
 
         SKMatrix matrix;
 
-        public ObservableCollection<(SKPath, SKColor)> SKPathColorPitches { get; set; }
+        public ObservableCollection<(SKPath, SKColor, bool, bool)> SKPathColorPitches { get; set; }
 
         /// <summary>
         /// Draws the chart content.

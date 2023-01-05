@@ -195,8 +195,16 @@ namespace Microcharts.Uno
 
         public void OnPointerMovedEvent(object sender, PointerRoutedEventArgs e)
         {
-            var x = e.GetCurrentPoint(this);
+            var pos = e.GetCurrentPoint(this);
 
+            if (HardwareAccelerated && MapViewGL?.Chart != null)
+            {
+                MapViewGL.Chart.HoverSKPath((float)pos.Position.X, (float)pos.Position.Y);
+            }
+            else if (MapView?.Chart != null)
+            {
+                MapView.Chart.HoverSKPath((float)pos.Position.X, (float)pos.Position.Y);
+            }
 
         }
     }
