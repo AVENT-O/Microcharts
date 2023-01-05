@@ -439,7 +439,7 @@ namespace Microcharts
 
                     skPath.Transform(matrix);
 
-                    var color = sKObject.Item3 ? new SKColor(sKObject.Item2.Red, sKObject.Item2.Green, sKObject.Item2.Blue, 155) : sKObject.Item2;
+                    var color = sKObject.Item4 ? new SKColor(sKObject.Item2.Red, sKObject.Item2.Green, sKObject.Item2.Blue, 230) : sKObject.Item2;
 
                     using var paint = new SKPaint
                     {
@@ -456,7 +456,7 @@ namespace Microcharts
                         {
                             Style = SKPaintStyle.Stroke,
                             Color = SKColors.Blue,
-                            StrokeWidth = 2,
+                            StrokeWidth = 4,
                             IsAntialias = true,
                         };
 
