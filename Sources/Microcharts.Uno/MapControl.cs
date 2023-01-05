@@ -24,7 +24,8 @@ namespace Microcharts.Uno
 
             if (GetTemplateChild("ContentPresenterMapViewGL") is UIElement contentGridMapViewGL)
             {
-                //contentGridMapViewGL.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                contentGridMapViewGL.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                contentGridMapViewGL.AddHandler(PointerMovedEvent, new PointerEventHandler(OnPointerMovedEvent), true);
                 //contentGridMapViewGL.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
                 contentGridMapViewGL.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
                 contentGridMapViewGL.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
@@ -35,7 +36,8 @@ namespace Microcharts.Uno
 
             if (GetTemplateChild("ContentPresenterMapView") is UIElement contentGridMapView)
             {
-                //contentGridMapView.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                contentGridMapView.AddHandler(TappedEvent, new TappedEventHandler(OnTappedEvent), true);
+                contentGridMapView.AddHandler(PointerMovedEvent, new PointerEventHandler(OnPointerMovedEvent), true);
                 //contentGridMapView.AddHandler(RightTappedEvent, new RightTappedEventHandler(OnRightTappedEvent), true);
                 contentGridMapView.AddHandler(ManipulationStartedEvent, new ManipulationStartedEventHandler(OnManipulationStarted), true);
                 contentGridMapView.AddHandler(ManipulationDeltaEvent, new ManipulationDeltaEventHandler(OnManipulationDelta), true);
@@ -175,6 +177,27 @@ namespace Microcharts.Uno
                 MapView.Chart.MaxValue += (float)e.Delta.Translation.Y;
                 MapView.Chart.Start += (int)Math.Round(e.Delta.Translation.X);
             }
+        }
+
+        public void OnTappedEvent(object sender, TappedRoutedEventArgs e)
+        {
+            var pos = e.GetPosition(this);
+
+            if (HardwareAccelerated && MapViewGL?.Chart != null)
+            {
+                MapViewGL.Chart.SetSKPath((float)pos.X, (float)pos.Y);
+            }
+            else if (MapView?.Chart != null)
+            {
+                MapView.Chart.SetSKPath((float)pos.X, (float)pos.Y);
+            }
+        }
+
+        public void OnPointerMovedEvent(object sender, PointerRoutedEventArgs e)
+        {
+            var x = e.GetCurrentPoint(this);
+
+
         }
     }
 }

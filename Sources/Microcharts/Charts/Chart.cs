@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,6 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
 using SkiaSharp.Views.UWP;
+using Svg;
+using Svg.Model;
 using Svg.Skia;
 using Windows.Storage;
 
@@ -33,6 +37,18 @@ namespace Microcharts
             var randomAccessStream = await storageFile.OpenAsync(FileAccessMode.Read);
 
             Svg.Load(randomAccessStream.AsStream());
+
+            SKPathColorPitches = new ObservableCollection<(SKPath, SKColor)>();
+
+            if (Svg.SvgPathPitches != null)
+            {
+                foreach (var x in Svg.SvgPathPitches.Values)
+                {
+                    var path = x.PathData.ToPath(SvgFillRule.EvenOdd);
+
+                    SKPathColorPitches.Add((path, SvgExtensions.GetColor((SvgColourServer)x.Fill)));
+                }
+            }
         }
 
         #region Fields
@@ -408,18 +424,62 @@ namespace Microcharts
                 float canvasMin = Math.Min(width, height);
                 float svgMax = Math.Max(Svg.Picture.CullRect.Width, Svg.Picture.CullRect.Height);
                 float scale = canvasMin / svgMax * mapScale;
-                var matrix = SKMatrix.CreateScale(scale, scale);
+                matrix = SKMatrix.CreateScale(scale, scale);
 
                 //var x = Svg.Model.Commands.ToList()[4];
 
                 //var y = ((ShimSkiaSharp.DrawPathCanvasCommand)x).Path;
 
                 // draw the svg
-                canvas.DrawPicture(Svg.Picture, ref matrix);
+                //canvas.DrawPicture(Svg.Picture, ref matrix);
+
+                foreach (var sKPath in SKPathColorPitches)
+                {
+                    var skPath2 = new SKPath(sKPath.Item1);
+
+                    skPath2.Transform(matrix);
+
+                    using var paint = new SKPaint
+                    {
+                        Style = SKPaintStyle.Fill,
+                        Color = sKPath.Item2,
+                        IsAntialias = true,
+                    };
+
+                    canvas.DrawPath(skPath2, paint);
+                }
             }
 
             //canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
         }
+
+        public void SetSKPath(float posx, float posy)
+        {
+            for (int i = SKPathColorPitches.Count - 1; i >= 0; --i )
+            {
+                var skPath2 = new SKPath(SKPathColorPitches[i].Item1);
+
+                skPath2.Transform(matrix);
+
+                var color = SKPathColorPitches[i].Item2;
+
+                if (skPath2.Contains(posx, posy))
+                {
+                    
+                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, 255, color.Blue, 255));
+                }
+                else
+                {
+                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, 100, color.Blue, 255));
+
+                }
+                Invalidate();
+            }
+        }
+
+        SKMatrix matrix;
+
+        public ObservableCollection<(SKPath, SKColor)> SKPathColorPitches { get; set; }
 
         /// <summary>
         /// Draws the chart content.
