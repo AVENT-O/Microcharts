@@ -199,7 +199,7 @@ namespace Microcharts
                 DrawHelper.DrawYAxis(ShowYAxisText, ShowYAxisLines, YAxisPosition, YAxisTextPaint, YAxisLinesPaint, Margin, AnimationProgress, MaxValue, ValueRange, canvas, width, yAxisXShift, yAxisIntervalLabels, headerHeight, itemSize, origin);
 
                 int nbSeries = series.Count();
-                for (int i = Start; i <= End; i++)
+                for (int i = Start; i <= End && i < labels.Count(); i++)
                 {
                     string label = labels[i];
                     SKRect labelSize = labelSizes[i];

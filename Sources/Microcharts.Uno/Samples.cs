@@ -90,7 +90,7 @@ namespace Microcharts.Uno
 
         public static MapChart CreateMapChart(bool addEntries = false)
         {
-            int nrEntries = 5000;
+            int nrEntries = 1;
             float maxValue = 100f;
 
             var entriesList = new List<ChartEntry>(nrEntries);

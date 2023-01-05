@@ -1,4 +1,5 @@
 using System;
+using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -151,12 +152,12 @@ namespace Microcharts.Uno
             if (HardwareAccelerated)
             {
                 if (MapViewGL?.Chart != null)
-                    MapViewGL.Chart.MapScale *= scale;
+                    MapViewGL.Chart.Scale *= scale;
             }
             else
             {
                 if (MapView?.Chart != null)
-                    MapView.Chart.MapScale *= scale;
+                    MapView.Chart.Scale *= scale;
             }
         }
 
@@ -195,17 +196,25 @@ namespace Microcharts.Uno
 
         public void OnPointerMovedEvent(object sender, PointerRoutedEventArgs e)
         {
+            var chart = (HardwareAccelerated && MapViewGL?.Chart != null) ? MapViewGL.Chart : MapView?.Chart != null ? MapView.Chart : null;
+
+            if (chart == null) return;
+
             var pos = e.GetCurrentPoint(this);
 
-            if (HardwareAccelerated && MapViewGL?.Chart != null)
+            if (e.Pointer.IsInContact)
             {
-                MapViewGL.Chart.HoverSKPath((float)pos.Position.X, (float)pos.Position.Y);
-            }
-            else if (MapView?.Chart != null)
-            {
-                MapView.Chart.HoverSKPath((float)pos.Position.X, (float)pos.Position.Y);
+                var x = chart.PointTranslateX + (float)(pos.Position.X - _oldPos.X);
+                var y = chart.PointTranslateY + (float)(pos.Position.Y - _oldPos.Y);
+
+                chart.SetTranslate(x, y);
             }
 
+            chart.HoverSKPath((float)pos.Position.X, (float)pos.Position.Y);
+
+            _oldPos = pos.Position;
         }
+
+        private Point _oldPos;
     }
 }

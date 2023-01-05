@@ -1,22 +1,20 @@
 // Copyright (c) Aloïs DENIEL. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using SkiaSharp;
+using Svg;
+using Svg.Model;
+using Svg.Skia;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using SkiaSharp;
-using SkiaSharp.Views.UWP;
-using Svg;
-using Svg.Model;
-using Svg.Skia;
 using Windows.Storage;
 
 namespace Microcharts
@@ -26,6 +24,10 @@ namespace Microcharts
     /// </summary>
     public abstract class Chart : INotifyPropertyChanged
     {
+        private float _scale = 1f;
+        private SKMatrix _matrixScale;
+        private SKPoint _pointTranslate;
+
         public SKSvg Svg { get; set; }
 
         public async Task LoadSvg(string svgName)
@@ -38,17 +40,21 @@ namespace Microcharts
 
             Svg.Load(randomAccessStream.AsStream());
 
-            SKPathColorPitches = new ObservableCollection<(SKPath, SKColor, bool, bool)>();
+            SKPathColorPitches = new ObservableCollection<(SKPath, SKColor, bool, bool, bool)>();
 
             if (Svg.SvgPathPitches != null)
             {
+                int i = 0;
+
                 foreach (var x in Svg.SvgPathPitches.Values)
                 {
+
                     var path = x.PathData.ToPath(SvgFillRule.EvenOdd);
 
-                    SKPathColorPitches.Add((path, SvgExtensions.GetColor((SvgColourServer)x.Fill), false, false));
+                    SKPathColorPitches.Add((path, SvgExtensions.GetColor((SvgColourServer)x.Fill), false, false, ++i % 3 == 0));
                 }
             }
+            Invalidate();
         }
 
         #region Fields
@@ -58,7 +64,7 @@ namespace Microcharts
         /// </summary>
         protected List<ChartEntry> entries;
 
-        private float animationProgress, margin = 20, labelTextSize = 16, mapScale = 1;
+        private float animationProgress, margin = 20, labelTextSize = 16;
 
         private SKColor backgroundColor = SKColors.White;
 
@@ -183,17 +189,37 @@ namespace Microcharts
             }
         }
 
-        /// <summary>
-        /// Gets or sets the text size of the labels.
-        /// </summary>
-        /// <value>The size of the label text.</value>
-        public float MapScale
+        public float Scale
         {
-            get => mapScale;
+            get => _scale;
             set
             {
-                Set(ref mapScale, value);
+                Set(ref _scale, value);
             }
+        }
+
+        public SKPoint PointTranslate
+        {
+            get => _pointTranslate;
+            set
+            {
+                Set(ref _pointTranslate, value);
+            }
+        }
+
+        public float PointTranslateX
+        {
+            get => _pointTranslate.X;
+        }
+
+        public float PointTranslateY
+        {
+            get => _pointTranslate.Y;
+        }
+
+        public void SetTranslate(float x, float y)
+        {
+            PointTranslate = new SKPoint(x, y);
         }
 
         /// <summary>
@@ -423,32 +449,23 @@ namespace Microcharts
                 // calculate the scaling need to fit to screen
                 float canvasMin = Math.Min(width, height);
                 float svgMax = Math.Max(Svg.Picture.CullRect.Width, Svg.Picture.CullRect.Height);
-                float scale = canvasMin / svgMax * mapScale;
-                matrix = SKMatrix.CreateScale(scale, scale);
+                float scale = width / Svg.Picture.CullRect.Width * _scale;
+                _matrixScale = SKMatrix.CreateScale(scale, scale);
+                _matrixScale.TransX = _pointTranslate.X;
+                _matrixScale.TransY = _pointTranslate.Y;
 
                 //var x = Svg.Model.Commands.ToList()[4];
 
                 //var y = ((ShimSkiaSharp.DrawPathCanvasCommand)x).Path;
 
                 // draw the svg
-                //canvas.DrawPicture(Svg.Picture, ref matrix);
+                canvas.DrawPicture(Svg.Picture, ref _matrixScale);
 
                 foreach (var sKObject in SKPathColorPitches)
                 {
                     var skPath = new SKPath(sKObject.Item1);
 
-                    skPath.Transform(matrix);
-
-                    var color = sKObject.Item4 ? new SKColor(sKObject.Item2.Red, sKObject.Item2.Green, sKObject.Item2.Blue, 230) : sKObject.Item2;
-
-                    using var paint = new SKPaint
-                    {
-                        Style = SKPaintStyle.Fill,
-                        Color = color,
-                        IsAntialias = true,
-                    };
-
-                    canvas.DrawPath(skPath, paint);
+                    skPath.Transform(_matrixScale);
 
                     if (sKObject.Item3)
                     {
@@ -462,7 +479,36 @@ namespace Microcharts
 
                         canvas.DrawPath(skPath, paintBorder);
                     }
+
+                    if (sKObject.Item4)
+                    {
+                        var color = new SKColor(0, 0, 255, 50);
+                        using var paint = new SKPaint
+                        {
+                            Style = SKPaintStyle.Fill,
+                            Color = color,
+                            IsAntialias = true,
+                        };
+
+                        canvas.DrawPath(skPath, paint);
+                    }
+
+                    if (sKObject.Item5)
+                    {
+                        var color = new SKColor(255, 0, 0, 100);
+                        using var paint = new SKPaint
+                        {
+                            Style = SKPaintStyle.Fill,
+                            Color = color,
+                            IsAntialias = true,
+                        };
+
+                        canvas.DrawPath(skPath, paint);
+                    }
                 }
+
+                //canvas.Translate(_x, _y);
+
             }
 
             //canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
@@ -470,7 +516,10 @@ namespace Microcharts
 
         public void SetSKPath(float posx, float posy)
         {
+            if (SKPathColorPitches == null) return;
+
             bool found = false;
+            bool invalidate = false;
 
             for (int i = SKPathColorPitches.Count - 1; i >= 0; --i )
             {
@@ -478,24 +527,29 @@ namespace Microcharts
 
                 var skPath = new SKPath(skObject.Item1);
 
-                skPath.Transform(matrix);
+                skPath.Transform(_matrixScale);
 
                 if (skPath.Contains(posx, posy) && !found)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, true, true);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, true, true, skObject.Item5);
                     found = true;
+                    invalidate = true;
                 }
-                else
+                else if (skObject.Item3 != false)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, false, false);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, false, false, skObject.Item5);
+                    invalidate = true;
                 }
             }
-            PlanifyInvalidate();
+            if (invalidate) Invalidate();
         }
 
         public void HoverSKPath(float posx, float posy)
         {
+            if (SKPathColorPitches == null) return;
+
             bool found = false;
+            bool invalidate = false;
 
             for (int i = SKPathColorPitches.Count - 1; i >= 0; --i)
             {
@@ -503,24 +557,24 @@ namespace Microcharts
 
                 var skPath = new SKPath(skObject.Item1);
 
-                skPath.Transform(matrix);
+                skPath.Transform(_matrixScale);
 
                 if (skPath.Contains(posx, posy) && !found)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, true);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, true, skObject.Item5);
                     found = true;
+                    invalidate = true;
                 }
-                else
+                else if (skObject.Item4 != false)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, false);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, false, skObject.Item5);
+                    invalidate = true;
                 }
             }
-            PlanifyInvalidate();
+            if (invalidate) Invalidate();
         }
 
-        SKMatrix matrix;
-
-        public ObservableCollection<(SKPath, SKColor, bool, bool)> SKPathColorPitches { get; set; }
+        public ObservableCollection<(SKPath, SKColor, bool, bool, bool)> SKPathColorPitches { get; set; }
 
         /// <summary>
         /// Draws the chart content.
@@ -638,14 +692,14 @@ namespace Microcharts
             switch (e.PropertyName)
             {
                 case nameof(AnimationProgress):
-                case nameof(MapScale):
+                case nameof(Scale):
+                case nameof(PointTranslate):
                     Invalidate();
                     break;
                 case nameof(LabelTextSize):
                 case nameof(MaxValue):
                 case nameof(MinValue):
                 case nameof(BackgroundColor):
-                
                     PlanifyInvalidate();
                     break;
                 default:
