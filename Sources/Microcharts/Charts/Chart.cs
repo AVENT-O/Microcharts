@@ -455,6 +455,8 @@ namespace Microcharts
 
         public void SetSKPath(float posx, float posy)
         {
+            bool found = false;
+
             for (int i = SKPathColorPitches.Count - 1; i >= 0; --i )
             {
                 var skPath2 = new SKPath(SKPathColorPitches[i].Item1);
@@ -463,17 +465,18 @@ namespace Microcharts
 
                 var color = SKPathColorPitches[i].Item2;
 
-                if (skPath2.Contains(posx, posy))
+                if (skPath2.Contains(posx, posy) && !found)
                 {
                     
-                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, 255, color.Blue, 255));
+                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, color.Green, color.Blue, 100));
+                    found = true;
                 }
                 else
                 {
-                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, 100, color.Blue, 255));
+                    SKPathColorPitches[i] = (SKPathColorPitches[i].Item1, new SKColor(color.Red, color.Green, color.Blue, 255));
 
                 }
-                Invalidate();
+                PlanifyInvalidate();
             }
         }
 
