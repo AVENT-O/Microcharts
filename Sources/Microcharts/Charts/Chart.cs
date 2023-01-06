@@ -27,6 +27,7 @@ namespace Microcharts
         private float _scale = 1f;
         private SKMatrix _matrixScale;
         private SKPoint _pointTranslate;
+        private int? _pitchNr;
 
         public SKSvg Svg { get; set; }
 
@@ -40,18 +41,29 @@ namespace Microcharts
 
             Svg.Load(randomAccessStream.AsStream());
 
-            SKPathColorPitches = new ObservableCollection<(SKPath, SKColor, bool, bool, bool)>();
+            SKPathColorPitches = new ObservableCollection<(int, SKPath, SKColor, bool, bool, bool)>();
 
             if (Svg.SvgPathPitches != null)
             {
                 int i = 0;
 
-                foreach (var x in Svg.SvgPathPitches.Values)
+                foreach (var x in Svg.SvgPathPitches)
                 {
 
-                    var path = x.PathData.ToPath(SvgFillRule.EvenOdd);
+                    var path = x.Value.PathData.ToPath(SvgFillRule.EvenOdd);
 
-                    SKPathColorPitches.Add((path, SvgExtensions.GetColor((SvgColourServer)x.Fill), false, false, ++i % 3 == 0));
+                    if (int.TryParse(x.Key.Substring(5, x.Key.Length - 5), out var pitchNr))
+                    {
+                        if (i==0)
+                        {
+                            SKPathColorPitches.Add((pitchNr, path, SvgExtensions.GetColor((SvgColourServer)x.Value.Fill), true, false, ++i % 3 == 0));
+                        }
+                        else
+                        {
+                            SKPathColorPitches.Add((pitchNr, path, SvgExtensions.GetColor((SvgColourServer)x.Value.Fill), false, false, ++i % 3 == 0));
+                        }
+                    }
+
                 }
             }
             Invalidate();
@@ -215,6 +227,30 @@ namespace Microcharts
         public float PointTranslateY
         {
             get => _pointTranslate.Y;
+        }
+
+        public int? PitchNr
+        {
+            get => _pitchNr;
+            set
+            {
+                if (SKPathColorPitches == null) return;
+
+                for (int i = 0; i < SKPathColorPitches.Count; i++)
+                {
+                    (int pitchNr, SKPath, SKColor, bool, bool, bool) x = SKPathColorPitches[i];
+
+                    if (x.Item1 == value && !x.Item4)
+                    {
+                        SKPathColorPitches[i] = (x.Item1, x.Item2, x.Item3, true, x.Item5, x.Item6);
+                    } else if (x.Item4)
+                    {
+                        SKPathColorPitches[i] = (x.Item1, x.Item2, x.Item3, false, x.Item5, x.Item6);
+                    }
+                }
+
+                Set(ref _pitchNr, value);
+            }
         }
 
         public void SetTranslate(float x, float y)
@@ -463,11 +499,11 @@ namespace Microcharts
 
                 foreach (var sKObject in SKPathColorPitches)
                 {
-                    var skPath = new SKPath(sKObject.Item1);
+                    var skPath = new SKPath(sKObject.Item2);
 
                     skPath.Transform(_matrixScale);
 
-                    if (sKObject.Item3)
+                    if (sKObject.Item4)
                     {
                         using var paintBorder = new SKPaint
                         {
@@ -482,7 +518,7 @@ namespace Microcharts
 
                     if (sKObject.Item4)
                     {
-                        var color = new SKColor(0, 0, 255, 50);
+                        var color = new SKColor(0, 0, 255, 100);
                         using var paint = new SKPaint
                         {
                             Style = SKPaintStyle.Fill,
@@ -494,6 +530,19 @@ namespace Microcharts
                     }
 
                     if (sKObject.Item5)
+                    {
+                        var color = new SKColor(0, 0, 255, 50);
+                        using var paint = new SKPaint
+                        {
+                            Style = SKPaintStyle.Fill,
+                            Color = color,
+                            IsAntialias = true,
+                        };
+
+                        canvas.DrawPath(skPath, paint);
+                    }
+
+                    if (sKObject.Item6)
                     {
                         var color = new SKColor(255, 0, 0, 100);
                         using var paint = new SKPaint
@@ -521,26 +570,28 @@ namespace Microcharts
             bool found = false;
             bool invalidate = false;
 
+            int? pitchNr = null;
             for (int i = SKPathColorPitches.Count - 1; i >= 0; --i )
             {
                 var skObject = SKPathColorPitches[i];
 
-                var skPath = new SKPath(skObject.Item1);
+                var skPath = new SKPath(skObject.Item2);
 
                 skPath.Transform(_matrixScale);
 
                 if (skPath.Contains(posx, posy) && !found)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, true, true, skObject.Item5);
+                    PitchNr = skObject.Item1;
                     found = true;
                     invalidate = true;
                 }
-                else if (skObject.Item3 != false)
+                else if (skObject.Item4 != false)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, false, false, skObject.Item5);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, false, skObject.Item5, skObject.Item6);
                     invalidate = true;
                 }
             }
+
             if (invalidate) Invalidate();
         }
 
@@ -555,26 +606,26 @@ namespace Microcharts
             {
                 var skObject = SKPathColorPitches[i];
 
-                var skPath = new SKPath(skObject.Item1);
+                var skPath = new SKPath(skObject.Item2);
 
                 skPath.Transform(_matrixScale);
 
                 if (skPath.Contains(posx, posy) && !found)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, true, skObject.Item5);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, skObject.Item4, true, skObject.Item6);
                     found = true;
                     invalidate = true;
                 }
-                else if (skObject.Item4 != false)
+                else if (skObject.Item5 != false)
                 {
-                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, false, skObject.Item5);
+                    SKPathColorPitches[i] = (skObject.Item1, skObject.Item2, skObject.Item3, skObject.Item4, false, skObject.Item6);
                     invalidate = true;
                 }
             }
             if (invalidate) Invalidate();
         }
 
-        public ObservableCollection<(SKPath, SKColor, bool, bool, bool)> SKPathColorPitches { get; set; }
+        public ObservableCollection<(int pitchNr, SKPath, SKColor, bool, bool, bool)> SKPathColorPitches { get; set; }
 
         /// <summary>
         /// Draws the chart content.
@@ -694,6 +745,7 @@ namespace Microcharts
                 case nameof(AnimationProgress):
                 case nameof(Scale):
                 case nameof(PointTranslate):
+                case nameof(PitchNr):
                     Invalidate();
                     break;
                 case nameof(LabelTextSize):
