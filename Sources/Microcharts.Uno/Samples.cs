@@ -87,42 +87,5 @@ namespace Microcharts.Uno
                 PointMode = PointMode.None
             };
         }
-
-        public static MapChart CreateMapChart(bool addEntries = false)
-        {
-            int nrEntries = 1;
-            float maxValue = 100f;
-
-            var entriesList = new List<ChartEntry>(nrEntries);
-
-            if (addEntries )
-            {
-                for (int i = 0; i < nrEntries; i = i + 2)
-                {
-                    entriesList.Add(new ChartEntry(0) { ValueLabel = "a", Label = "1" });
-                    entriesList.Add(new ChartEntry(i * maxValue / nrEntries - 100 * (float)Math.Sin(0.0001 * i)) { ValueLabel = "a", Label = "1" });
-                }
-            }
-
-            return new MapChart
-            {
-                IsAnimated = false,
-                Entries = entriesList,
-                PointSize = 0,
-                EnableYFadeOutGradient = false,
-                LineSize = 1,
-                LineMode = LineMode.Straight,
-                MaxValue = maxValue,
-                MinValue = 0, // -maxValue,
-                LineAreaAlpha = 0,
-                PointAreaAlpha = 0,
-                ValueLabelTextSize = 10,
-                LabelTextSize = 10,
-                LabelOrientation = Orientation.Horizontal,
-                Margin = 10,
-                BackgroundColor = SKColors.Transparent,
-                PointMode = PointMode.None
-            };
-        }
     }
 }

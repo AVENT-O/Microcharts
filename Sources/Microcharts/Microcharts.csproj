@@ -35,9 +35,6 @@
             <Version>2.88.3</Version>
         </PackageReference>
     </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\..\Svg.Skia\src\Svg.Skia\Svg.Skia.csproj" />
-    </ItemGroup>
     
     <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views.Uno">

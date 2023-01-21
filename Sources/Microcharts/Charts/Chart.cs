@@ -2,9 +2,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using SkiaSharp;
-using Svg;
-using Svg.Model;
-using Svg.Skia;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,46 +25,6 @@ namespace Microcharts
         private SKMatrix _matrixScale;
         private SKPoint _pointTranslate;
         private int? _pitchNr;
-
-        public SKSvg Svg { get; set; }
-
-        public async Task LoadSvg(string svgName)
-        {
-            // create a new SVG object
-            Svg = new SKSvg();
-
-            var storageFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(svgName));
-            var randomAccessStream = await storageFile.OpenAsync(FileAccessMode.Read);
-
-            Svg.Load(randomAccessStream.AsStream());
-
-            SKPathColorPitches = new ObservableCollection<(int, SKPath, SKColor, bool, bool, bool)>();
-
-            if (Svg.SvgPathPitches != null)
-            {
-                int i = 0;
-
-                foreach (var x in Svg.SvgPathPitches)
-                {
-
-                    var path = x.Value.PathData.ToPath(SvgFillRule.EvenOdd);
-
-                    if (int.TryParse(x.Key.Substring(5, x.Key.Length - 5), out var pitchNr))
-                    {
-                        if (i==0)
-                        {
-                            SKPathColorPitches.Add((pitchNr, path, SvgExtensions.GetColor((SvgColourServer)x.Value.Fill), true, false, ++i % 3 == 0));
-                        }
-                        else
-                        {
-                            SKPathColorPitches.Add((pitchNr, path, SvgExtensions.GetColor((SvgColourServer)x.Value.Fill), false, false, ++i % 3 == 0));
-                        }
-                    }
-
-                }
-            }
-            Invalidate();
-        }
 
         #region Fields
 
@@ -470,97 +427,6 @@ namespace Microcharts
             }
 
             DrawContent(canvas, width, height);
-
-            if (Svg != null && Svg.Picture != null)
-            {
-                //var surface = e.Surface;
-                //var canvas = surface.Canvas;
-
-                //var width = e.Info.Width;
-                //var height = e.Info.Height;
-
-                // clear the surface
-                //canvas.Clear(SKColors.White);
-
-                // calculate the scaling need to fit to screen
-                float canvasMin = Math.Min(width, height);
-                float svgMax = Math.Max(Svg.Picture.CullRect.Width, Svg.Picture.CullRect.Height);
-                float scale = width / Svg.Picture.CullRect.Width * _scale;
-                _matrixScale = SKMatrix.CreateScale(scale, scale);
-                _matrixScale.TransX = _pointTranslate.X;
-                _matrixScale.TransY = _pointTranslate.Y;
-
-                //var x = Svg.Model.Commands.ToList()[4];
-
-                //var y = ((ShimSkiaSharp.DrawPathCanvasCommand)x).Path;
-
-                // draw the svg
-                canvas.DrawPicture(Svg.Picture, ref _matrixScale);
-
-                foreach (var sKObject in SKPathColorPitches)
-                {
-                    var skPath = new SKPath(sKObject.Item2);
-
-                    skPath.Transform(_matrixScale);
-
-                    if (sKObject.Item4)
-                    {
-                        using var paintBorder = new SKPaint
-                        {
-                            Style = SKPaintStyle.Stroke,
-                            Color = SKColors.Blue,
-                            StrokeWidth = 4,
-                            IsAntialias = true,
-                        };
-
-                        canvas.DrawPath(skPath, paintBorder);
-                    }
-
-                    if (sKObject.Item4)
-                    {
-                        var color = new SKColor(0, 0, 255, 100);
-                        using var paint = new SKPaint
-                        {
-                            Style = SKPaintStyle.Fill,
-                            Color = color,
-                            IsAntialias = true,
-                        };
-
-                        canvas.DrawPath(skPath, paint);
-                    }
-
-                    if (sKObject.Item5)
-                    {
-                        var color = new SKColor(0, 0, 255, 50);
-                        using var paint = new SKPaint
-                        {
-                            Style = SKPaintStyle.Fill,
-                            Color = color,
-                            IsAntialias = true,
-                        };
-
-                        canvas.DrawPath(skPath, paint);
-                    }
-
-                    if (sKObject.Item6)
-                    {
-                        var color = new SKColor(255, 0, 0, 100);
-                        using var paint = new SKPaint
-                        {
-                            Style = SKPaintStyle.Fill,
-                            Color = color,
-                            IsAntialias = true,
-                        };
-
-                        canvas.DrawPath(skPath, paint);
-                    }
-                }
-
-                //canvas.Translate(_x, _y);
-
-            }
-
-            //canvas.DrawText("AAA", new SKPoint(50, 50), paint2);
         }
 
         public void SetSKPath(float posx, float posy)
