@@ -17,7 +17,7 @@
         <Copyright>Copyright 2020</Copyright>
         <PackageIconUrl>https://raw.githubusercontent.com/aloisdeniel/Microcharts/master/Documentation/Logo.png</PackageIconUrl>
         <TargetFrameworks>uap10.0.18362;xamarinios10;monoandroid12.0</TargetFrameworks>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -30,6 +30,7 @@
     </PropertyGroup>
     <ItemGroup>
         <!--<PackageReference Include="Svg.Skia" Version="0.5.18" />-->
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="4.2.0" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="SkiaSharp">
             <Version>2.88.3</Version>
