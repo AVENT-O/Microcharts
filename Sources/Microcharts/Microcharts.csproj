@@ -30,22 +30,22 @@
     </PropertyGroup>
     <ItemGroup>
         <!--<PackageReference Include="Svg.Skia" Version="0.5.18" />-->
-        <PackageReference Include="SkiaSharp.Views.Uno" Version="2.88.5" />
+        <PackageReference Include="SkiaSharp.Views.Uno" Version="2.88.6" />
         <PackageReference Include="Uno.SourceGenerationTasks" Version="4.2.0" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="SkiaSharp">
-            <Version>2.88.5</Version>
+            <Version>2.88.6</Version>
         </PackageReference>
     </ItemGroup>
     
     <ItemGroup Condition="'$(TargetFramework)'!='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views.Uno">
-            <Version>2.88.5</Version>
+            <Version>2.88.6</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)'=='uap10.0.18362'">
         <PackageReference Include="SkiaSharp.Views">
-            <Version>2.88.5</Version>
+            <Version>2.88.6</Version>
         </PackageReference>
     </ItemGroup>
 
